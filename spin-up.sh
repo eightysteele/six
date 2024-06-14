@@ -2,6 +2,9 @@
 
 set -eu
 
+SIX_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+PROJECT_DIR=$(dirname "$SIX_DIR")
+
 if [ -f .env ]; then
 	export $(cat .env | xargs)
 fi
@@ -39,6 +42,7 @@ bootstrap() {
 		gh repo clone "$SPACEMACS_D" "$SPACEMACS_D"
 	fi
 
+
 	pushd "$SPACEMACS_D" >/dev/null 2>&1
 	if git log HEAD..origin/$(git rev-parse --abbrev-ref HEAD) --oneline | grep .; then
 		echo "Heads up: There are upstream changes to pull from $SPACEMACS_D"
@@ -50,7 +54,9 @@ bootstrap() {
 }
 
 main() {
-	bootstrap
+    pushd "$SIX_DIR" >/dev/null 2>&1
+	  bootstrap
+    popd >/dev/null 2>&1
 }
 
 main "$@"

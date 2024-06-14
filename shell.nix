@@ -23,6 +23,7 @@ in pkgs.mkShell {
   shellHook = ''
     echo "stand by..."
     ./spin-up.sh
+    export SPACEMACSDIR=$(realpath "$PWD/spacemacs.d")
     echo "six ready"
   '';
 }
