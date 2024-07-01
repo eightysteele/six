@@ -10,6 +10,7 @@ let
   docker-layer = pkgs.callPackage ./layers/docker.nix { };
   shell-scripts-layer = pkgs.callPackage ./layers/shell-scripts.nix { };
   nixos-layer = pkgs.callPackage ./layers/nixos.nix { };
+  #python-layer = pkgs.callPackage ./layers/python.nix { };
 in pkgs.mkShell {
   packages = with pkgs; [
     emacs
@@ -17,13 +18,14 @@ in pkgs.mkShell {
     docker-layer
     shell-scripts-layer
     nixos-layer
+    #python-layer
     (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
   ];
 
   shellHook = ''
     echo "stand by..."
     ./spin-up.sh
-    export SPACEMACSDIR=$(realpath "$PWD/spacemacs.d")
+    export SPACEMACSDIR=$(realpath "$XDG_CONFIG_HOME/spacemacs.d")
     echo "six ready"
   '';
 }

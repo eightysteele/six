@@ -18,7 +18,7 @@ emacs-daemon-running() {
 }
 
 emacs-daemon-start() {
-	yes | emacs --daemon
+	emacs --daemon --init-directory "$HOME/$EMACS_D"
 }
 
 bootstrap() {
@@ -29,23 +29,20 @@ bootstrap() {
 	echo "✓ gh online"
 	sleep 0.5
 
+	pushd "$HOME" >/dev/null 2>&1
 	if [ ! -d "$EMACS_D" ]; then
 		gh repo clone "$SPACEMACS" "$EMACS_D"
 		mkdir "$EMACS_D/org-roam"
 		gh repo clone "$ORG_ROAM_DATA" "$EMACS_D/org-roam/$ORG_ROAM_DATA"
 	fi
+	popd >/dev/null 2>&1
 
 	echo "✓ emacs online"
 	sleep 0.5
 
+	pushd "$XDG_CONFIG_HOME" >/dev/null 2>&1
 	if [ ! -d "$SPACEMACS_D" ]; then
 		gh repo clone "$SPACEMACS_D" "$SPACEMACS_D"
-	fi
-
-
-	pushd "$SPACEMACS_D" >/dev/null 2>&1
-	if git log HEAD..origin/$(git rev-parse --abbrev-ref HEAD) --oneline | grep .; then
-		echo "Heads up: There are upstream changes to pull from $SPACEMACS_D"
 	fi
 	popd >/dev/null 2>&1
 
@@ -54,9 +51,12 @@ bootstrap() {
 }
 
 main() {
-    pushd "$SIX_DIR" >/dev/null 2>&1
-	  bootstrap
-    popd >/dev/null 2>&1
+	bootstrap
+	if ! emacs-daemon-running; then
+		emacs-daemon-start
+		sleep 3.0
+	fi
+	emacsclient -nc
 }
 
 main "$@"
